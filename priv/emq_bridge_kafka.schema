@@ -1,0 +1,15 @@
+%%-*- mode: erlang -*-
+%% emq_kafka_bridge config mapping
+
+%% {@configurable}
+{mapping, "bridge.bootstrap_broker", "emq_kafka_bridge.gc_interval", [
+  {default, "127.0.0.1:9092"},
+  {datatype, string}
+]}.
+
+%% {@configurable}
+{mapping, "bridge.partition_strategy", "emq_kafka_bridge.gc_interval", [
+  {default, "strict_round_robin"},
+  {datatype, string}
+]}.
+
