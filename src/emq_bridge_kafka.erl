@@ -39,23 +39,55 @@ load(Env) ->
     emqttd:hook('message.acked', fun ?MODULE:on_message_acked/4, [Env]).
 
 %% transform message and return
-on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
-    {ok, Message};
+% on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
+%     {ok, Message};
 
-on_message_publish(Message = #mqtt_message{pktid   = PkgId,
-                        qos     = Qos,
-                        retain  = Retain,
-                        dup     = Dup,
-                        topic   = Topic,
-                        payload = Payload
-						}, _Env) ->
+% on_message_publish(Message = #mqtt_message{pktid   = PkgId,
+%                         qos     = Qos,
+%                         retain  = Retain,
+%                         dup     = Dup,
+%                         topic   = Topic,
+%                         payload = Payload
+% 						}, _Env) ->
+%     io:format("publish ~s~n", [emqttd_message:format(Message)]),
+%     Str1 = <<"{\"topic\":\"">>,
+%     Str2 = <<"\", \"message\":[">>,
+%     Str3 = <<"]}">>,
+%     Str4 = <<Str1/binary, Topic/binary, Str2/binary, Payload/binary, Str3/binary>>,
+% 	{ok,ProduceTopic}= application:get_key(kafka_producer_topic),
+%     ekaf:produce_async(ProduceTopic, Str4),	
+%     {ok, Message}.
+
+get_form_clientid({ClientId, Username}) -> ClientId;
+get_form_clientid(From) -> From.
+get_form_username({ClientId, Username}) -> Username;
+get_form_username(From) -> From.
+
+on_message_publish(Message,_Env) ->
+    From = Message#mqtt_message.from, 
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+    Qos = Message#mqtt_message.qos,
+    Dup = Message#mqtt_message.dup,
+    Retain = Message#mqtt_message.retain,
+    {ok, KTopic} = application:get_env(ekaf, ekaf_bootstrap_topics),
+    ClientId = get_form_clientid(From),
+    Username = get_form_username(From),
+    Str = [
+              {client_id, ClientId},
+              {message, [
+                            {username, Username},
+                            {topic, Topic},
+                            {payload, Payload},
+                            {qos, Qos},
+                            {dup, Dup},
+                            {retain, Retain}
+                        ]},
+               {cluster_node, node()},
+               {ts, emqttd_time:now_ms()}
+           ],
+    ekaf:produce_async(KTopic, Str),
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
-    Str1 = <<"{\"topic\":\"">>,
-    Str2 = <<"\", \"message\":[">>,
-    Str3 = <<"]}">>,
-    Str4 = <<Str1/binary, Topic/binary, Str2/binary, Payload/binary, Str3/binary>>,
-	{ok,ProduceTopic}= application:get_key(kafka_producer_topic),
-    ekaf:produce_async(ProduceTopic, Str4),	
     {ok, Message}.
 
 
