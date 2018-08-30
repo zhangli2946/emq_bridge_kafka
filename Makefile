@@ -1,4 +1,4 @@
-PROJECT = emqttd_kafka_bridge
+PROJECT = emq_bridge_kafka
 PROJECT_DESCRIPTION = EMQTTD Kafka Bridge
 PROJECT_VERSION = 2.0.x
 
@@ -17,4 +17,4 @@ include erlang.mk
 app:: rebar.config
 
 app.config::
-	./deps/cuttlefish/cuttlefish -l info -e etc/ -c etc/emqttd_kafka_bridge.conf -i priv/emqttd_kafka_bridge.schema -d data
+	./deps/cuttlefish/cuttlefish -l info -e etc/ -c etc/emq_bridge_kafka.conf -i priv/emq_bridge_kafka.schema -d data
