@@ -86,7 +86,8 @@ on_message_publish(Message,_Env) ->
                {cluster_node, node()},
                {ts, emqttd_time:now_ms()}
            ],
-    ekaf:produce_async(KTopic, Str),
+    Json = mochijson2:encode(Str),
+    ekaf:produce_async(KTopic, list_to_binary(Json)),
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
     {ok, Message}.
 
