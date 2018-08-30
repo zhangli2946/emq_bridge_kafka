@@ -68,11 +68,15 @@ on_message_acked(ClientId, Username, Message, _Env) ->
     {ok, Message}.
 
 ekaf_init(_Env) ->
-
-    {ok,BootstrapBroker} = application:get_key(bootstrap_broker),
-    {ok,PartitionStrategy}= application:get_key(partition_strategy),
-    application:set_env(ekaf, ekaf_partition_strategy, PartitionStrategy),
-    application:set_env(ekaf, ekaf_bootstrap_broker, BootstrapBroker),
+    {ok, Kafka_Env} = application:get_env(?APP, server),
+    Host = proplists:get_value(host, Kafka_Env),
+    Port = proplists:get_value(port, Kafka_Env),
+    Topic = proplists:get_value(topic, Kafka_Env),
+    Broker = {Host, Port},
+    application:set_env(ekaf, ekaf_partition_strategy, strict_round_robin),
+    application:set_env(ekaf, ekaf_bootstrap_broker, Broker),
+    application:set_env(ekaf, ekaf_buffer_ttl, 100),
+    application:set_env(ekaf, ekaf_bootstrap_topics, list_to_binary(Topic)),
     {ok, _} = application:ensure_all_started(ekaf),
     io:format("Initialized ekaf with ~p~n", [{"localhost", 9092}]).
 
