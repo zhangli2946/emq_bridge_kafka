@@ -68,7 +68,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
     {ok, Message}.
 
 ekaf_init(_Env) ->
-    {ok, Kafka_Env} = application:get_env(?APP, server),
+    {ok, Kafka_Env} = application:get_env(?MODULE, server),
     Host = proplists:get_value(host, Kafka_Env),
     Port = proplists:get_value(port, Kafka_Env),
     Topic = proplists:get_value(topic, Kafka_Env),

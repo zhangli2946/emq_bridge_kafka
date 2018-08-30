@@ -1,27 +1,27 @@
-{mapping, "emq.plugin.kafka.server", "emq_plugin_kafka.server", [
+{mapping, "emq.bridge.kafka.server", "emq_bridge_kafka.server", [
  {default, {"127.0.0.1", 6379}},
  {datatype, [integer, ip, string]}
 ]}.
  
  
 %% emq.msg.kafka.topic
-{mapping, "emq.plugin.kafka.topic", "emq_plugin_kafka.server", [
+{mapping, "emq.bridge.kafka.topic", "emq_bridge_kafka.server", [
  {default, "test"},
  {datatype, string},
  hidden
 ]}.
  
 {
- translation,"emq_plugin_kafka.server",fun(Conf) -> 
+ translation,"emq_bridge_kafka.server",fun(Conf) -> 
   {RHost, RPort} = 
-  case cuttlefish:conf_get("emq.plugin.kafka.server", Conf) of
+  case cuttlefish:conf_get("emq.bridge.kafka.server", Conf) of
    {Ip, Port} -> {Ip, Port};
    S -> case string:tokens(S, ":") of
     [Domain] -> {Domain, 9092};
     [Domain, Port] -> {Domain, list_to_integer(Port)}
    end
   end,
- Topic = cuttlefish:conf_get("emq.plugin.kafka.topic", Conf),
+ Topic = cuttlefish:conf_get("emq.bridge.kafka.topic", Conf),
  [  
   {host, RHost},
   {port, RPort},
