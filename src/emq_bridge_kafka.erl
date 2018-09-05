@@ -64,19 +64,18 @@ on_message_publish(Message,_Env) ->
     ]),
     ekaf:produce_async(KTopic, list_to_binary(Json)),
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
-    {ok, Message}
-
+    {ok, Message};
 on_message_publish(Message = #mqtt_message{topic = <<"ni/rx/", _/binary>>},_Env) ->
-        {ok, KTopic} = application:get_env(ekaf, rxtopics),
-        Topic = Message#mqtt_message.topic,
-        Payload = Message#mqtt_message.payload,
-        Json = mochijson2:encode([
-            {topic, Topic},
-            {payload, Payload}
-        ]),
-        ekaf:produce_async(KTopic, list_to_binary(Json)),
-        io:format("publish ~s~n", [emqttd_message:format(Message)]),
-        {ok, Message}.
+    {ok, KTopic} = application:get_env(ekaf, rxtopics),
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+    Json = mochijson2:encode([
+        {topic, Topic},
+        {payload, Payload}
+    ]),
+    ekaf:produce_async(KTopic, list_to_binary(Json)),
+    io:format("publish ~s~n", [emqttd_message:format(Message)]),
+    {ok, Message}.
 
 ekaf_init(_Env) ->
     {ok, Kafka_Env} = application:get_env(?MODULE, server),
