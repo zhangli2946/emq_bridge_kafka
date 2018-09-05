@@ -39,32 +39,32 @@ get_form_clientid(From) -> From.
 get_form_username({ClientId, Username}) -> Username;
 get_form_username(From) -> From.
 
-on_message_publish(Message,_Env) ->
-    From = Message#mqtt_message.from, 
-    Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload,
-    Qos = Message#mqtt_message.qos,
-    Dup = Message#mqtt_message.dup,
-    Retain = Message#mqtt_message.retain,
-    {ok, KTopic} = application:get_env(ekaf, ekaf_bootstrap_topics),
-    ClientId = get_form_clientid(From),
-    Username = get_form_username(From),
-    Json = mochijson2:encode([
-        {client_id, ClientId},
-        {message, [
-            {username, Username},
-            {topic, Topic},
-            {payload, Payload},
-            {qos, Qos},
-            {dup, Dup},
-            {retain, Retain}
-        ]},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_ms()}
-    ]),
-    ekaf:produce_async(KTopic, list_to_binary(Json)),
-    io:format("publish ~s~n", [emqttd_message:format(Message)]),
-    {ok, Message}.
+% on_message_publish(Message,_Env) ->
+%     From = Message#mqtt_message.from, 
+%     Topic = Message#mqtt_message.topic,
+%     Payload = Message#mqtt_message.payload,
+%     Qos = Message#mqtt_message.qos,
+%     Dup = Message#mqtt_message.dup,
+%     Retain = Message#mqtt_message.retain,
+%     {ok, KTopic} = application:get_env(ekaf, ekaf_bootstrap_topics),
+%     ClientId = get_form_clientid(From),
+%     Username = get_form_username(From),
+%     Json = mochijson2:encode([
+%         {client_id, ClientId},
+%         {message, [
+%             {username, Username},
+%             {topic, Topic},
+%             {payload, Payload},
+%             {qos, Qos},
+%             {dup, Dup},
+%             {retain, Retain}
+%         ]},
+%         {cluster_node, node()},
+%         {ts, emqttd_time:now_ms()}
+%     ]),
+%     ekaf:produce_async(KTopic, list_to_binary(Json)),
+%     io:format("publish ~s~n", [emqttd_message:format(Message)]),
+%     {ok, Message}.
 
 on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>},_Env) ->
         {ok, KTopic} = application:get_env(ekaf, rxtopics),
