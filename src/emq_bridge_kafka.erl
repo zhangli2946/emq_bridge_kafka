@@ -66,7 +66,7 @@ on_message_publish(Message,_Env) ->
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
     {ok, Message}.
 
-on_message_publish(Message{topic=<<"$SYS/", _/binary>>},_Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>},_Env) ->
         {ok, KTopic} = application:get_env(ekaf, rxtopics),
         Topic = Message#mqtt_message.topic,
         Payload = Message#mqtt_message.payload,
@@ -95,4 +95,4 @@ ekaf_init(_Env) ->
 
 %% Called when the plugin application stop
 unload() ->
-    emqttd:unhook('message.publish', fun ?MODULE:on_message_publish/2),
+    emqttd:unhook('message.publish', fun ?MODULE:on_message_publish/2).
