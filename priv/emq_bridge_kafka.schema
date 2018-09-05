@@ -10,6 +10,13 @@
  {datatype, string},
  hidden
 ]}.
+
+%% emq.msg.kafka.rxtopic
+{mapping, "emq.bridge.kafka.rxtopic", "emq_bridge_kafka.server", [
+ {default, "test"},
+ {datatype, string},
+ hidden
+]}.
  
 {
  translation,"emq_bridge_kafka.server",fun(Conf) -> 
@@ -22,8 +29,10 @@
    end
   end,
  Topic = cuttlefish:conf_get("emq.bridge.kafka.topic", Conf),
+ RxTopic = cuttlefish:conf_get("emq.bridge.kafka.rxtopic", Conf),
  [  
   {host, RHost},
   {port, RPort},
-  {topic, Topic}]
+  {topic, Topic},
+  {rxtopic, RxTopic}]
  end}.
