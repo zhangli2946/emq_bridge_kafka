@@ -66,7 +66,7 @@ get_form_username(From) -> From.
 %     io:format("publish ~s~n", [emqttd_message:format(Message)]),
 %     {ok, Message}.
 
-on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>},_Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"ni/rx/", _/binary>>},_Env) ->
         {ok, KTopic} = application:get_env(ekaf, rxtopics),
         Topic = Message#mqtt_message.topic,
         Payload = Message#mqtt_message.payload,
