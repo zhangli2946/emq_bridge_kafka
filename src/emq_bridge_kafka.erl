@@ -72,7 +72,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>},_Env) 
         Payload = Message#mqtt_message.payload,
         Json = mochijson2:encode([
             {topic, Topic},
-            {payload, Payload},
+            {payload, Payload}
         ]),
         ekaf:produce_async(KTopic, list_to_binary(Json)),
         io:format("publish ~s~n", [emqttd_message:format(Message)]),
