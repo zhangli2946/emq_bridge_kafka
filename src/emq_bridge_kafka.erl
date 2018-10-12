@@ -34,7 +34,7 @@ load(Env) ->
 	ekaf_init([Env]),
     emqttd:hook('message.publish', fun ?MODULE:on_message_publish/2, [Env]).
 
-on_message_publish(Message = #mqtt_message{topic = <<"ni/rx/", _/binary>>},_Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"ni/tx/", _/binary>>},_Env) ->
     {ok, KTopic} = application:get_env(ekaf, rxtopics),
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
