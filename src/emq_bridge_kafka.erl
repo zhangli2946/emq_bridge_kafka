@@ -34,8 +34,19 @@ load(Env) ->
 	ekaf_init([Env]),
     emqttd:hook('message.publish', fun ?MODULE:on_message_publish/2, [Env]).
 
+on_message_publish(Message = #mqtt_message{topic = <<"ni/mtx/", _/binary>>},_Env) ->
+    {ok, KTopic} = application:get_env(ekaf, mtxtopics),
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+    Json = mochijson2:encode([
+        {topic, Topic},
+        {payload, Payload}
+    ]),
+    ekaf:produce_async(KTopic, list_to_binary(Json)),
+    io:format("publish ~s~n", [emqttd_message:format(Message)]),
+    {ok, Message};
 on_message_publish(Message = #mqtt_message{topic = <<"ni/tx/", _/binary>>},_Env) ->
-    {ok, KTopic} = application:get_env(ekaf, rxtopics),
+    {ok, KTopic} = application:get_env(ekaf, txtopics),
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     Json = mochijson2:encode([
@@ -52,14 +63,14 @@ ekaf_init(_Env) ->
     {ok, Kafka_Env} = application:get_env(?MODULE, server),
     Host = proplists:get_value(host, Kafka_Env),
     Port = proplists:get_value(port, Kafka_Env),
-    Topic = proplists:get_value(topic, Kafka_Env),
-    RxTopic = proplists:get_value(rxtopic, Kafka_Env),
+    TxTopic = proplists:get_value(txtopic, Kafka_Env),
+    MtxTopic = proplists:get_value(mtxtopic, Kafka_Env),
     Broker = {Host, Port},
     application:set_env(ekaf, ekaf_partition_strategy, strict_round_robin),
     application:set_env(ekaf, ekaf_bootstrap_broker, Broker),
     application:set_env(ekaf, ekaf_buffer_ttl, 100),
-    application:set_env(ekaf, ekaf_bootstrap_topics, list_to_binary(Topic)),
-    application:set_env(ekaf, rxtopics, list_to_binary(RxTopic)),
+    application:set_env(ekaf, txtopics, list_to_binary(TxTopic)),
+    application:set_env(ekaf, mtxtopics, list_to_binary(MtxTopic)),
     {ok, _} = application:ensure_all_started(ekaf),
     io:format("Initialized ekaf with ~p~n", [{"localhost", 9092}]).
 

@@ -5,14 +5,14 @@
  
  
 %% emq.msg.kafka.topic
-{mapping, "emq.bridge.kafka.topic", "emq_bridge_kafka.server", [
+{mapping, "emq.bridge.kafka.txtopic", "emq_bridge_kafka.server", [
  {default, "test"},
  {datatype, string},
  hidden
 ]}.
 
 %% emq.msg.kafka.rxtopic
-{mapping, "emq.bridge.kafka.rxtopic", "emq_bridge_kafka.server", [
+{mapping, "emq.bridge.kafka.mtxtopic", "emq_bridge_kafka.server", [
  {default, "test"},
  {datatype, string},
  hidden
@@ -28,11 +28,11 @@
     [Domain, Port] -> {Domain, list_to_integer(Port)}
    end
   end,
- Topic = cuttlefish:conf_get("emq.bridge.kafka.topic", Conf),
- RxTopic = cuttlefish:conf_get("emq.bridge.kafka.rxtopic", Conf),
+ Topic = cuttlefish:conf_get("emq.bridge.kafka.txtopic", Conf),
+ RxTopic = cuttlefish:conf_get("emq.bridge.kafka.mtxtopic", Conf),
  [  
   {host, RHost},
   {port, RPort},
-  {topic, Topic},
-  {rxtopic, RxTopic}]
+  {txtopic, Topic},
+  {mtxtopic, RxTopic}]
  end}.
