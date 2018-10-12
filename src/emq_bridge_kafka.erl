@@ -36,24 +36,14 @@ load(Env) ->
 
 on_message_publish(Message = #mqtt_message{topic = <<"ni/mtx/", _/binary>>},_Env) ->
     {ok, KTopic} = application:get_env(ekaf, mtxtopics),
-    Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
-    Json = mochijson2:encode([
-        {topic, Topic},
-        {payload, Payload}
-    ]),
-    ekaf:produce_async(KTopic, list_to_binary(Json)),
+    ekaf:produce_async(KTopic, Payload),
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
     {ok, Message};
 on_message_publish(Message = #mqtt_message{topic = <<"ni/tx/", _/binary>>},_Env) ->
     {ok, KTopic} = application:get_env(ekaf, txtopics),
-    Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
-    Json = mochijson2:encode([
-        {topic, Topic},
-        {payload, Payload}
-    ]),
-    ekaf:produce_async(KTopic, list_to_binary(Json)),
+    ekaf:produce_async(KTopic, Payload),
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
     {ok, Message};
 on_message_publish(Message,_Env) ->
